@@ -43,7 +43,18 @@ func (cc *ChainConfig) GetValInfo(first bool) (err error) {
 	// Fetch info from /cosmos.staking.v1beta1.Query/Validator
 	// it's easier to ask people to provide valoper since it's readily available on
 	// explorers, so make it easy and lookup the consensus key for them.
-	cc.valInfo.Conspub, cc.valInfo.Moniker, cc.valInfo.Jailed, cc.valInfo.Bonded, err = getVal(ctx, cc.client, cc.ValAddress)
+	if cc.name == "Neutron"  {
+		fmt.Println("Skipping regular valInfo on Neutron")
+
+		pk := ed25519.PubKey{[]byte{64, 140, 253, 13, 26, 151, 69, 229, 3, 65, 124, 120, 48, 17, 66, 197, 83, 203, 112, 197}}
+
+		cc.valInfo.Conspub = pk.Bytes()
+		cc.valInfo.Moniker = "SG-1"
+		cc.valInfo.Jailed = false
+		cc.valInfo.Bonded = true
+	} else {
+		cc.valInfo.Conspub, cc.valInfo.Moniker, cc.valInfo.Jailed, cc.valInfo.Bonded, err = getVal(ctx, cc.client, cc.ValAddress)
+	}
 	if err != nil {
 		return
 	}
